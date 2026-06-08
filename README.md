@@ -64,32 +64,32 @@ Além da camada agrícola, o projeto conta com uma **camada espacial** que monit
 │           Resource Group: rg-eclipse-protocol                  │
 │                                                                │
 │  ┌──────────────────────────────────────────────────────────┐  │
-│  │   VM — vm-eclipse-protocol (Standard_B2s)               │  │
-│  │   Ubuntu 22.04 LTS · 2 vCPUs · 4 GB RAM                │  │
-│  │   NSG: 22 | 80 | 8080 | 8082 | 9092                    │  │
+│  │   VM — vm-eclipse-protocol (Standard_B2s)                │  │
+│  │   Ubuntu 22.04 LTS · 2 vCPUs · 4 GB RAM                  │  │
+│  │   NSG: 22 | 80 | 8080 | 8082 | 9092                      │  │
 │  │                                                          │  │
-│  │   ┌──────────────────────────────────────────────────┐  │  │
-│  │   │  Docker Engine — rede: eclipse-network           │  │  │
-│  │   │                                                  │  │  │
-│  │   │  ┌─────────────────────┐  ┌──────────────────┐  │  │  │
-│  │   │  │ RM561082-eclipse-app│  │RM561082-eclipse-db│  │  │  │
-│  │   │  │                     │  │                  │  │  │  │
-│  │   │  │ Spring Boot 3       │  │ H2 Server        │  │  │  │
-│  │   │  │ Java 17             │  │ oscarfonts/h2    │  │  │  │
-│  │   │  │ USER: eclipse(1001) │  │ :8082 (console)  │  │  │  │
-│  │   │  │ WORKDIR: /app       │  │ :9092 (TCP)      │  │  │  │
-│  │   │  │ :8080               │  │                  │  │  │  │
-│  │   │  └──────────┬──────────┘  └────────┬─────────┘  │  │  │
-│  │   │             │                      │             │  │  │
-│  │   │             └──────────┬───────────┘             │  │  │
-│  │   │                        │                         │  │  │
-│  │   │             ┌──────────▼──────────┐              │  │  │
-│  │   │             │  Volume Nomeado     │              │  │  │
-│  │   │             │  eclipse_h2_data    │              │  │  │
-│  │   │             │  /app/data          │              │  │  │
-│  │   │             │  eclipsedb.mv.db    │              │  │  │
-│  │   │             └─────────────────────┘              │  │  │
-│  │   └──────────────────────────────────────────────────┘  │  │
+│  │   ┌──────────────────────────────────────────────────┐   │  │
+│  │   │  Docker Engine — rede: eclipse-network           │   │  │
+│  │   │                                                  │   │  │
+│  │   │  ┌─────────────────────┐  ┌───────────────────┐  │   │  │
+│  │   │  │ RM561082-eclipse-app│  │RM561082-eclipse-db│  │   │  │
+│  │   │  │                     │  │                   │  │   │  │
+│  │   │  │ Spring Boot 3       │  │ H2 Server         │  │   │  │
+│  │   │  │ Java 17             │  │ oscarfonts/h2     │  │   │  │
+│  │   │  │ USER: eclipse(1001) │  │ :8082 (console)   │  │   │  │
+│  │   │  │ WORKDIR: /app       │  │ :9092 (TCP)       │  │   │  │
+│  │   │  │ :8080               │  │                   │  │   │  │
+│  │   │  └──────────┬──────────┘  └────────┬──────────┘  │   │  │
+│  │   │             │                      │             │   │  │
+│  │   │             └──────────┬───────────┘             │   │  │
+│  │   │                        │                         │   │  │
+│  │   │             ┌──────────▼──────────┐              │   │  │
+│  │   │             │  Volume Nomeado     │              │   │  │
+│  │   │             │  eclipse_h2_data    │              │   │  │
+│  │   │             │  /app/data          │              │   │  │
+│  │   │             │  eclipsedb.mv.db    │              │   │  │
+│  │   │             └─────────────────────┘              │   │  │
+│  │   └──────────────────────────────────────────────────┘   │  │
 │  └──────────────────────────────────────────────────────────┘  │
 └────────────────────────────────────────────────────────────────┘
          ▲
@@ -358,6 +358,6 @@ docker container exec RM561082-eclipse-db \
 
 ---
 
-> **FIAP** — Global Solution 2026/1  
+> **FIAP** — Global Solution 2026  
 > Disciplina: DevOps Tools & Cloud Computing  
-> Repositório: [github.com/GlobalSolution-FIAP2026/eclipse-protocol-java](https://github.com/GlobalSolution-FIAP2026/eclipse-protocol-java)
+> Repositório: [github.com/GlobalSolution-FIAP2026/eclipse-protocol-cloud](https://github.com/GlobalSolution-FIAP2026/eclipse-protocol-cloud)
