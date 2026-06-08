@@ -1,45 +1,42 @@
 # ══════════════════════════════════════════════════════════════
 # Eclipse Protocol — Docker Compose
-# ──────────────────────────────────────────────────────────────
 # Container App : RM561082-eclipse-app  (Spring Boot + H2)
 # Container DB  : RM561082-eclipse-db   (H2 Server standalone)
-# Rede          : eclipse-network
-# Volume        : eclipse_h2_data
-# Background    : restart: unless-stopped
+# Rede          : eclipse-network (ambos na mesma rede)
+# Volume        : eclipse_h2_data (persistência)
 # ══════════════════════════════════════════════════════════════
 
 services:
 
-  # Container do Banco H2 (Server Mode)
-  # Imagem pública do H2 em modo servidor TCP
+  # ── Container do Banco H2 (Server Mode) ──────────────────────
   eclipse-db:
     image: oscarfonts/h2:latest
     container_name: RM561082-eclipse-db
-    restart: unless-stopped # background
-    environment:  # variável de ambiente
+    restart: unless-stopped
+    environment:
       H2_OPTIONS: "-tcp -tcpAllowOthers -tcpPort 9092 -web -webAllowOthers -webPort 8082"
     ports:
-      - "9092:9092" # TCP H2
-      - "8082:8082" # H2 Console Web
+      - "9092:9092"
+      - "8082:8082"
     volumes:
-      - eclipse_h2_data:/opt/h2-data # volume nomeado
+      - eclipse_h2_data:/opt/h2-data
     networks:
-      - eclipse-network # mesma rede que o app
+      - eclipse-network
 
-  # Container da Aplicação Spring Boot
+  # ── Container da Aplicação Spring Boot ───────────────────────
   eclipse-app:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: RM561082-eclipse-app
-    restart: unless-stopped # background
+    restart: unless-stopped
     depends_on:
       - eclipse-db
-    environment: # variáveis de ambiente
+    environment:
       APP_NAME: eclipse-protocol
       APP_ENV: prod
+      APP_PORT: "8080"
       SPRING_PROFILES_ACTIVE: prod
-      # H2 em modo arquivo local (dentro do container)
       SPRING_DATASOURCE_URL: jdbc:h2:file:/app/data/eclipsedb;AUTO_SERVER=TRUE
       SPRING_DATASOURCE_USERNAME: sa
       SPRING_DATASOURCE_PASSWORD: ""
@@ -49,23 +46,26 @@ services:
       SPRING_H2_CONSOLE_ENABLED: "true"
       SPRING_H2_CONSOLE_PATH: /h2-console
       SPRING_H2_CONSOLE_SETTINGS_WEB_ALLOW_OTHERS: "true"
+      SPRINGDOC_SWAGGER_UI_PATH: /swagger-ui.html
+      SPRINGDOC_API_DOCS_PATH: /api-docs
+      SPRING_CACHE_TYPE: simple
       MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: health,info
     ports:
-      - "8080:8080"                         # porta da API
+      - "8080:8080"
     volumes:
-      - eclipse_h2_data:/app/data           # mesmo volume — dados compartilhados
+      - eclipse_h2_data:/app/data
     networks:
-      - eclipse-network                     # mesma rede que o DB
-    user: "1001"                            # usuário eclipse sem root
+      - eclipse-network
+    user: "1001"
 
-# Rede compartilhada
+# ── Rede compartilhada ────────────────────────────────────────
 networks:
   eclipse-network:
     driver: bridge
     name: eclipse-network
 
-# Volume Nomeado
+# ── Volume Nomeado ─────────────────────────────────────────────
 volumes:
   eclipse_h2_data:
     driver: local
-    name: eclipse_h2_data  # nome explícito para fácil identificação
+    name: eclipse_h2_data
