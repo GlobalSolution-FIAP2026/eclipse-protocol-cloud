@@ -8,7 +8,7 @@
 
 services:
 
-  # ── Container do Banco H2 (Server Mode) ──────────────────────
+  # Container do Banco H2 (Server Mode)
   eclipse-db:
     image: oscarfonts/h2:latest
     container_name: RM561082-eclipse-db
@@ -23,7 +23,7 @@ services:
     networks:
       - eclipse-network
 
-  # ── Container da Aplicação Spring Boot ───────────────────────
+  # Container da Aplicação Spring Boot
   eclipse-app:
     build:
       context: .
@@ -58,13 +58,13 @@ services:
       - eclipse-network
     user: "1001"
 
-# ── Rede compartilhada ────────────────────────────────────────
+# Rede compartilhada
 networks:
   eclipse-network:
     driver: bridge
     name: eclipse-network
 
-# ── Volume Nomeado ─────────────────────────────────────────────
+# Volume Nomeado
 volumes:
   eclipse_h2_data:
     driver: local
