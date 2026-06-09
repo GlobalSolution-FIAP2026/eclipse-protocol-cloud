@@ -9,13 +9,14 @@
 1. [Descrição do Projeto](#1-descrição-do-projeto)
 2. [Benefícios para o Negócio](#2-benefícios-para-o-negócio)
 3. [Arquitetura Macro na Nuvem](#3-arquitetura-macro-na-nuvem)
-4. [Entidades e Rotas da API](#4-entidades-e-rotas-da-api)
-5. [Instalação — How To](#5-instalação--how-to)
-6. [Dockerfile](#6-dockerfile)
-7. [Docker Compose](#7-docker-compose)
-8. [Script Azure CLI](#8-script-azure-cli)
-9. [Evidências SELECT no Banco](#9-evidências-select-no-banco)
-10. [Equipe](#10-equipe)
+4. [Entidades](#4-entidades)
+5. [Endpoints da API](#5-endpoints-da-api)
+6. [Instalação — How To](#6-instalação--how-to)
+7. [Dockerfile](#7-dockerfile)
+8. [Docker Compose](#8-docker-compose)
+9. [Script Azure CLI](#9-script-azure-cli)
+10. [Evidências SELECT no Banco](#10-evidências-select-no-banco)
+11. [Equipe](#11-equipe)
 
 ---
 
@@ -66,7 +67,7 @@ Além da camada agrícola, o projeto conta com uma **camada espacial** que monit
 │  ┌──────────────────────────────────────────────────────────┐  │
 │  │   VM — vm-eclipse-protocol (Standard_B2s)                │  │
 │  │   Ubuntu 22.04 LTS · 2 vCPUs · 4 GB RAM                  │  │
-│  │   NSG: 22 | 80 | 8080 | 8082 | 9092                      │  │
+│  │   NSG: 22 | 8080                                         │  │
 │  │                                                          │  │
 │  │   ┌──────────────────────────────────────────────────┐   │  │
 │  │   │  Docker Engine — rede: eclipse-network           │   │  │
@@ -76,8 +77,8 @@ Além da camada agrícola, o projeto conta com uma **camada espacial** que monit
 │  │   │  │                     │  │                   │  │   │  │
 │  │   │  │ Spring Boot 3       │  │ H2 Server         │  │   │  │
 │  │   │  │ Java 17             │  │ oscarfonts/h2     │  │   │  │
-│  │   │  │ USER: eclipse(1001) │  │ :8082 (console)   │  │   │  │
-│  │   │  │ WORKDIR: /app       │  │ :9092 (TCP)       │  │   │  │
+│  │   │  │ USER: eclipse(1001) │  │ :8080 (console)   │  │   │  │
+│  │   │  │ WORKDIR: /app       │  │                   │  │   │  │
 │  │   │  │ :8080               │  │                   │  │   │  │
 │  │   │  └──────────┬──────────┘  └────────┬──────────┘  │   │  │
 │  │   │             │                      │             │   │  │
@@ -103,75 +104,281 @@ Além da camada agrícola, o projeto conta com uma **camada espacial** que monit
 
 ---
 
-## 4. Entidades e Rotas da API
+## 4. Entidades
 
-### 🧑 Usuario — `/usuarios`
-| Método | Rota | Descrição |
-|--------|------|-----------|
-| GET | `/usuarios` | Listar todos |
-| GET | `/usuarios/{id}` | Buscar por ID |
-| POST | `/usuarios` | Criar usuário |
-| PUT | `/usuarios/{id}` | Atualizar |
-| DELETE | `/usuarios/{id}` | Remover |
+### 🧑 Usuario
+| Campo | Tipo | Descrição |
+|---|---|---|
+| id | Long | Identificador único |
+| nome | String | Nome completo |
+| email | String | E-mail único |
+| senha | String | Senha de acesso |
+| ativo | Boolean | Status do usuário |
+| dataCriacao | LocalDateTime | Data de criação |
 
-### 🏡 Propriedade — `/propriedades`
-| Método | Rota | Descrição |
-|--------|------|-----------|
-| GET | `/propriedades` | Listar todas |
-| GET | `/propriedades/{id}` | Buscar por ID |
-| POST | `/propriedades` | Criar propriedade |
-| PUT | `/propriedades/{id}` | Atualizar |
-| DELETE | `/propriedades/{id}` | Remover |
+### 📍 Localizacao
+| Campo | Tipo | Descrição |
+|---|---|---|
+| id | Long | Identificador único |
+| cidade | String | Cidade |
+| estado | String | Estado (UF) |
+| pais | String | País |
+| coordenadas | **@Embedded** `Coordenadas` | Objeto embutido com latitude e longitude |
+| coordenadas.latitude | Double | Latitude geográfica |
+| coordenadas.longitude | Double | Longitude geográfica |
+| cep | String | CEP |
 
-### 🌱 Plantacao — `/plantacoes`
-| Método | Rota | Descrição |
-|--------|------|-----------|
-| GET | `/plantacoes` | Listar todas |
-| GET | `/plantacoes/{id}` | Buscar por ID |
-| POST | `/plantacoes` | Criar plantação |
-| PUT | `/plantacoes/{id}` | Atualizar |
-| DELETE | `/plantacoes/{id}` | Remover |
+> `Coordenadas` é uma classe `@Embeddable` dentro de `Localizacao`. Os campos `latitude` e `longitude` são persistidos diretamente nas colunas `NR_LATITUDE` e `NR_LONGITUDE` via `@AttributeOverride`.
 
-### 📡 Sensor — `/sensores`
-| Método | Rota | Descrição |
-|--------|------|-----------|
-| GET | `/sensores` | Listar todos |
-| GET | `/sensores/{id}` | Buscar por ID |
-| POST | `/sensores` | Criar sensor |
-| PUT | `/sensores/{id}` | Atualizar |
-| DELETE | `/sensores/{id}` | Remover |
+### 🏡 Propriedade
+| Campo | Tipo | Descrição |
+|---|---|---|
+| id | Long | Identificador único |
+| nome | String | Nome da propriedade |
+| areaTotal | Double | Área total (ha) |
+| tipoSolo | String | Tipo do solo |
+| localizacao | Localizacao | FK localização |
+| usuario | Usuario | FK proprietário |
 
-### 📊 Leitura — `/leituras`
-| Método | Rota | Descrição |
-|--------|------|-----------|
-| GET | `/leituras` | Listar todas |
-| GET | `/leituras/{id}` | Buscar por ID |
-| POST | `/leituras` | Registrar leitura |
-| PUT | `/leituras/{id}` | Atualizar |
-| DELETE | `/leituras/{id}` | Remover |
+### 🌱 Plantacao
+| Campo | Tipo | Descrição |
+|---|---|---|
+| id | Long | Identificador único |
+| nome | String | Nome da plantação |
+| cultura | String | Tipo de cultura |
+| areaHectares | Double | Área em hectares |
+| status | String | Status atual |
+| propriedade | Propriedade | FK propriedade |
 
-### 🚨 Alerta — `/alertas`
-| Método | Rota | Descrição |
-|--------|------|-----------|
-| GET | `/alertas` | Listar todos |
-| GET | `/alertas/{id}` | Buscar por ID |
-| GET | `/alertas/abertos` | Alertas em aberto |
-| POST | `/alertas` | Criar alerta |
-| PUT | `/alertas/{id}` | Atualizar status |
-| DELETE | `/alertas/{id}` | Remover |
+### 📡 Sensor
+| Campo | Tipo | Descrição |
+|---|---|---|
+| id | Long | Identificador único |
+| nome | String | Nome do sensor |
+| tipo | String | Tipo do sensor |
+| ativo | Boolean | Status do sensor |
+| plantacao | Plantacao | FK plantação |
+
+> `Sensor` usa `@Inheritance(SINGLE_TABLE)`. O subtipo `SensorEspecializado` estende `Sensor` adicionando o campo `unidadeMedida`. O discriminador é a coluna `DS_SUBTIPO`.
+
+### 📊 Leitura
+| Campo | Tipo | Descrição |
+|---|---|---|
+| id | Long | Identificador único |
+| temperatura | Double | Temperatura (°C) |
+| umidade | Double | Umidade (%) |
+| precipitacao | Double | Precipitação (mm) |
+| ndvi | Double | Índice NDVI |
+| dataLeitura | LocalDateTime | Data/hora da leitura |
+| sensor | Sensor | FK sensor |
+
+### 🚨 Alerta
+| Campo | Tipo | Descrição |
+|---|---|---|
+| id | Long | Identificador único |
+| tipoAlerta | Enum | Tipo do alerta |
+| severidade | Enum | Nível de severidade |
+| mensagem | String | Descrição do alerta |
+| status | Enum | Status do alerta |
+| dataCriacao | LocalDateTime | Data/hora de criação |
+| leitura | Leitura | FK leitura |
+| plantacao | Plantacao | FK plantação |
+
+#### Enums do Alerta
+| Enum | Valores |
+|---|---|
+| TipoAlerta | `TEMP_ALTA`, `TEMP_BAIXA`, `UMID_ALTA`, `UMID_BAIXA`, `NDVI_CRITICO`, `PRECIPITACAO_EXCESSIVA` |
+| Severidade | `BAIXA`, `MEDIA`, `ALTA`, `CRITICA` |
+| StatusAlerta | `ABERTO`, `RECONHECIDO`, `RESOLVIDO` |
+
+---
+
+### 🛰️ Satelite *(Camada Espacial)*
+| Campo | Tipo | Descrição |
+|---|---|---|
+| id | Long | Identificador único |
+| nome | String | Nome do satélite |
+| tipo | String | Tipo do satélite |
+| orbita | String | Tipo de órbita |
+| altitudeKm | Double | Altitude em km |
+| status | Enum | Status operacional |
+| dataLancamento | LocalDate | Data de lançamento |
+
+#### Enum StatusSatelite
+| Valor | Descrição |
+|---|---|
+| `ATIVO` | Satélite em operação |
+| `INATIVO` | Satélite fora de operação |
+| `DESCOMISSIONADO` | Satélite desativado permanentemente |
+
+---
+
+### 🖼️ ImagemSatelite *(Camada Espacial)*
+| Campo | Tipo | Descrição |
+|---|---|---|
+| id | Long | Identificador único |
+| satelite | Satelite | FK satélite (N:1) |
+| plantacao | Plantacao | FK plantação (N:1) |
+| urlImagem | String | URL da imagem capturada |
+| ndvi | Double | Índice NDVI da imagem |
+| coberturaNuvem | Double | % de cobertura de nuvens |
+| dataCaptura | LocalDateTime | Data/hora da captura |
+
+---
+
+### 🗑️ LixoEspacial *(Camada Espacial)*
+| Campo | Tipo | Descrição |
+|---|---|---|
+| id | Long | Identificador único |
+| nomeObjeto | String | Nome/identificação do objeto |
+| tipoObjeto | String | Tipo do objeto |
+| altitudeKm | Double | Altitude em km |
+| velocidadeKmh | Double | Velocidade em km/h |
+| orbita | String | Órbita do objeto |
+| dataIdentificacao | LocalDate | Data de identificação |
+
+---
+
+### ⚠️ RiscoOrbital *(Camada Espacial)*
+| Campo | Tipo | Descrição |
+|---|---|---|
+| idSatelite + idLixoEspacial | **Chave composta** (`@EmbeddedId`) | Par único que identifica o risco |
+| satelite | Satelite | FK satélite (N:1) — parte da chave |
+| lixoEspacial | LixoEspacial | FK lixo espacial (N:1) — parte da chave |
+| nivelRisco | Enum | Nível de risco identificado |
+| descricaoRisco | String | Descrição detalhada do risco |
+| dataAnalise | LocalDateTime | Data/hora da análise |
+
+> A chave primária é composta por `(idSatelite, idLixoEspacial)`. Só pode existir **um registro de risco por par satélite/debris**.
+
+#### Enum NivelRisco
+| Valor | Descrição |
+|---|---|
+| `BAIXO` | Risco baixo |
+| `MODERADO` | Risco moderado |
+| `ALTO` | Risco alto |
+| `CRITICO` | Risco crítico |
+
 
 ### 🔎 Utilitários
 | URL | Descrição |
 |-----|-----------|
 | `http://<HOST>:8080/swagger-ui.html` | Documentação interativa |
-| `http://<HOST>:8080/actuator/health` | Health check |
-| `http://<HOST>:8082` | H2 Console Web |
+| `http://<HOST>:8080/h2-console` | H2 Console Web |
 
 **H2 Console:** URL: `jdbc:h2:file:/app/data/eclipsedb` · User: `sa` · Senha: *(vazio)*
 
 ---
 
-## 5. Instalação — How To
+## 5. Endpoints da API
+
+### Autenticação
+| Método | Endpoint | Descrição | Auth |
+|---|---|---|--|
+| POST | `/auth/login` | Realiza login e retorna token JWT | ✅ |
+
+### Usuários
+| Método | Endpoint | Descrição | Auth |
+|---|---|---|--|
+| GET | `/usuarios` | Lista todos os usuários | ✅ |
+| GET | `/usuarios/{id}` | Busca usuário por ID | ✅ |
+| POST | `/usuarios` | Cria novo usuário | ✅ |
+| PUT | `/usuarios/{id}` | Atualiza usuário | ✅ |
+| DELETE | `/usuarios/{id}` | Remove usuário | ✅ |
+
+### Localizações
+| Método | Endpoint | Descrição | Auth |
+|---|---|---|---|
+| GET | `/localizacoes` | Lista todas as localizações | ✅ |
+| GET | `/localizacoes/{id}` | Busca localização por ID | ✅ |
+| POST | `/localizacoes` | Cria nova localização | ✅ |
+| PUT | `/localizacoes/{id}` | Atualiza localização | ✅ |
+| DELETE | `/localizacoes/{id}` | Remove localização | ✅ |
+
+### Propriedades
+| Método | Endpoint | Descrição | Auth |
+|---|---|---|---|
+| GET | `/propriedades` | Lista todas as propriedades | ✅ |
+| GET | `/propriedades/{id}` | Busca propriedade por ID | ✅ |
+| POST | `/propriedades` | Cria nova propriedade | ✅ |
+| PUT | `/propriedades/{id}` | Atualiza propriedade | ✅ |
+| DELETE | `/propriedades/{id}` | Remove propriedade | ✅ |
+
+### Plantações
+| Método | Endpoint | Descrição | Auth |
+|---|---|---|---|
+| GET | `/plantacoes` | Lista todas as plantações | ✅ |
+| GET | `/plantacoes/{id}` | Busca plantação por ID | ✅ |
+| POST | `/plantacoes` | Cria nova plantação | ✅ |
+| PUT | `/plantacoes/{id}` | Atualiza plantação | ✅ |
+| DELETE | `/plantacoes/{id}` | Remove plantação | ✅ |
+
+### Sensores
+| Método | Endpoint | Descrição | Auth |
+|---|---|---|---|
+| GET | `/sensores` | Lista todos os sensores | ✅ |
+| GET | `/sensores/{id}` | Busca sensor por ID | ✅ |
+| POST | `/sensores` | Cria novo sensor | ✅ |
+| PUT | `/sensores/{id}` | Atualiza sensor | ✅ |
+| DELETE | `/sensores/{id}` | Remove sensor | ✅ |
+
+### Leituras
+| Método | Endpoint | Descrição | Auth |
+|---|---|---|---|
+| GET | `/leituras` | Lista todas as leituras | ✅ |
+| GET | `/leituras/{id}` | Busca leitura por ID | ✅ |
+| POST | `/leituras` | Registra nova leitura | ✅ |
+| PUT | `/leituras/{id}` | Atualiza leitura | ✅ |
+| DELETE | `/leituras/{id}` | Remove leitura | ✅ |
+
+### Alertas
+| Método | Endpoint | Descrição | Auth |
+|---|---|---|---|
+| GET | `/alertas` | Lista todos os alertas | ✅ |
+| GET | `/alertas/{id}` | Busca alerta por ID | ✅ |
+| POST | `/alertas` | Cria novo alerta | ✅ |
+| PUT | `/alertas/{id}` | Atualiza alerta | ✅ |
+| DELETE | `/alertas/{id}` | Remove alerta | ✅ |
+
+### Satélites *(Camada Espacial)*
+| Método | Endpoint | Descrição | Auth |
+|---|---|---|---|
+| GET | `/satelites` | Lista todos os satélites | ✅ |
+| GET | `/satelites/{id}` | Busca satélite por ID | ✅ |
+| POST | `/satelites` | Cadastra novo satélite | ✅ |
+| PUT | `/satelites/{id}` | Atualiza satélite | ✅ |
+| DELETE | `/satelites/{id}` | Remove satélite | ✅ |
+
+### Imagens de Satélite *(Camada Espacial)*
+| Método | Endpoint | Descrição | Auth |
+|---|---|---|---|
+| GET | `/imagens-satelite` | Lista todas as imagens | ✅ |
+| GET | `/imagens-satelite/{id}` | Busca imagem por ID | ✅ |
+| POST | `/imagens-satelite` | Registra nova imagem | ✅ |
+| PUT | `/imagens-satelite/{id}` | Atualiza imagem | ✅ |
+| DELETE | `/imagens-satelite/{id}` | Remove imagem | ✅ |
+
+### Lixo Espacial *(Camada Espacial)*
+| Método | Endpoint | Descrição | Auth |
+|---|---|---|---|
+| GET | `/lixo-espacial` | Lista todos os objetos | ✅ |
+| GET | `/lixo-espacial/{id}` | Busca objeto por ID | ✅ |
+| POST | `/lixo-espacial` | Registra novo objeto | ✅ |
+| PUT | `/lixo-espacial/{id}` | Atualiza objeto | ✅ |
+| DELETE | `/lixo-espacial/{id}` | Remove objeto | ✅ |
+
+### Riscos Orbitais *(Camada Espacial)*
+| Método | Endpoint | Descrição | Auth |
+|---|---|---|---|
+| GET | `/riscos-orbitais` | Lista todos os riscos | ✅ |
+| GET | `/riscos-orbitais/{idSatelite}/{idLixoEspacial}` | Busca risco pela chave composta | ✅ |
+| POST | `/riscos-orbitais` | Registra novo risco | ✅ |
+| PUT | `/riscos-orbitais/{idSatelite}/{idLixoEspacial}` | Atualiza risco | ✅ |
+| DELETE | `/riscos-orbitais/{idSatelite}/{idLixoEspacial}` | Remove risco | ✅ |
+
+---
+
+## 6. Instalação — How To
 
 ### Pré-requisitos
 - Docker 24+ e Docker Compose Plugin
@@ -182,7 +389,7 @@ Além da camada agrícola, o projeto conta com uma **camada espacial** que monit
 
 ```bash
 # 1. Clonar o repositório
-git clone https://github.com/GlobalSolution-FIAP2026/eclipse-protocol-java.git
+git clone https://github.com/GlobalSolution-FIAP2026/eclipse-protocol-cloud.git
 cd eclipse-protocol-java
 
 # 2. Subir os 2 containers em background
@@ -195,23 +402,19 @@ docker compose ps
 docker compose logs -f eclipse-app
 docker compose logs -f eclipse-db
 
-# 5. Testar API
-curl http://localhost:8080/actuator/health
-curl http://localhost:8080/usuarios
-
-# 6. Acessar H2 Console
+# 5. Acessar H2 Console
 # http://localhost:8082
 # JDBC URL: jdbc:h2:file:/app/data/eclipsedb
 
-# 7. Acessar Swagger
+# 6. Acessar Swagger
 # http://localhost:8080/swagger-ui.html
 
-# 8. Verificar usuário dos containers
+# 7. Verificar usuário dos containers
 docker container exec RM561082-eclipse-app whoami   # eclipse
 docker container exec RM561082-eclipse-app pwd       # /app
 docker container exec RM561082-eclipse-app ls -l /app
 
-# 9. Derrubar (sem apagar dados)
+# 8. Derrubar (sem apagar dados)
 docker compose down
 # Para apagar dados também:
 docker compose down -v
@@ -231,24 +434,20 @@ ssh eclipseadmin@<VM_IP>
 
 # 4. Clonar e subir
 cd /opt/eclipse-protocol
-git clone https://github.com/GlobalSolution-FIAP2026/eclipse-protocol-java.git .
+git clone https://github.com/GlobalSolution-FIAP2026/eclipse-protocol-cloud.git .
 docker compose up -d --build
 
-# 5. Rodar demo completo
-chmod +x demo.sh && ./demo.sh <VM_IP>
-
-# 6. AO FINALIZAR — deletar VM
+# 5. AO FINALIZAR — deletar VM
 exit
 ./azure-delete.sh
 ```
 
 ---
 
-## 6. Dockerfile
+## 7. Dockerfile
 
 ```dockerfile
 FROM maven:3.9-eclipse-temurin-17-alpine
-RUN apk add --no-cache curl
 RUN addgroup -S eclipse && adduser -S eclipse -G eclipse -u 1001
 WORKDIR /app
 ENV APP_NAME="eclipse-protocol" APP_ENV="prod" APP_PORT=8080
@@ -260,16 +459,16 @@ RUN mkdir -p /app/data && chown -R eclipse:eclipse /app
 RUN cp target/*.jar app.jar && chown eclipse:eclipse app.jar
 USER eclipse
 EXPOSE 8080
-HEALTHCHECK --interval=30s --timeout=10s --start-period=90s --retries=3 \
-  CMD curl -f http://localhost:8080/actuator/health || exit 1
-ENTRYPOINT ["java", "-Dspring.profiles.active=prod", \
+ENTRYPOINT ["java", \
+  "-Djava.security.egd=file:/dev/./urandom", \
+  "-Dspring.profiles.active=prod", \
   "-Dspring.datasource.url=jdbc:h2:file:/app/data/eclipsedb;AUTO_SERVER=TRUE", \
   "-jar", "app.jar"]
 ```
 
 ---
 
-## 7. Docker Compose
+## 8. Docker Compose
 
 ```yaml
 services:
@@ -293,8 +492,8 @@ services:
     restart: unless-stopped
     depends_on: [eclipse-db]
     environment:
-      SPRING_DATASOURCE_URL: jdbc:h2:file:/app/data/eclipsedb;AUTO_SERVER=TRUE
       SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:h2:file:/app/data/eclipsedb;AUTO_SERVER=TRUE
     ports:
       - "8080:8080"
     volumes:
@@ -314,12 +513,12 @@ volumes:
 
 ---
 
-## 8. Script Azure CLI
+## 9. Script Azure CLI
 
 O script `azure-setup.sh` executa em sequência:
 1. Resource Group `rg-eclipse-protocol` em `eastus`
 2. VM Ubuntu 22.04 LTS — `Standard_B2s`
-3. NSG com portas: 22, 80, 8080, 8082, 9092
+3. NSG com portas: 22, 8080
 4. Docker Engine, Docker Compose Plugin, Git e ferramentas
 
 Para remover ao final:
@@ -329,7 +528,7 @@ Para remover ao final:
 
 ---
 
-## 9. Evidências SELECT no Banco
+## 10. Evidências SELECT no Banco
 
 ```bash
 # Conectar no container do banco e executar SELECT
@@ -340,13 +539,13 @@ docker container exec RM561082-eclipse-db \
   -sql "SELECT * FROM TB_USUARIO;"
 
 # Ou via H2 Console Web:
-# http://<HOST>:8082
+# http://<HOST>:8080
 # JDBC URL: jdbc:h2:file:/opt/h2-data/eclipsedb
 ```
 
 ---
 
-## 10. Equipe
+## 11. Equipe
 
 | Nome | RM |
 |------|----|
