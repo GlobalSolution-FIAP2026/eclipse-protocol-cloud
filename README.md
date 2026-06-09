@@ -15,7 +15,7 @@
 7. [Dockerfile](#7-dockerfile)
 8. [Docker Compose](#8-docker-compose)
 9. [Script Azure CLI](#9-script-azure-cli)
-10. [Evidências SELECT no Banco](#10-evidências-select-no-banco)
+10. [Vídeo Explicativo](#10-vídeo-explicativo)
 11. [Equipe](#11-equipe)
 
 ---
@@ -59,48 +59,7 @@ Além da camada agrícola, o projeto conta com uma **camada espacial** que monit
 
 ## 3. Arquitetura Macro na Nuvem
 
-```
-┌────────────────────────────────────────────────────────────────┐
-│                  MICROSOFT AZURE — East US                     │
-│           Resource Group: rg-eclipse-protocol                  │
-│                                                                │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │   VM — vm-eclipse-protocol (Standard_B2s)                │  │
-│  │   Ubuntu 22.04 LTS · 2 vCPUs · 4 GB RAM                  │  │
-│  │   NSG: 22 | 8080                                         │  │
-│  │                                                          │  │
-│  │   ┌──────────────────────────────────────────────────┐   │  │
-│  │   │  Docker Engine — rede: eclipse-network           │   │  │
-│  │   │                                                  │   │  │
-│  │   │  ┌─────────────────────┐  ┌───────────────────┐  │   │  │
-│  │   │  │ RM561082-eclipse-app│  │RM561082-eclipse-db│  │   │  │
-│  │   │  │                     │  │                   │  │   │  │
-│  │   │  │ Spring Boot 3       │  │ H2 Server         │  │   │  │
-│  │   │  │ Java 17             │  │ oscarfonts/h2     │  │   │  │
-│  │   │  │ USER: eclipse(1001) │  │ :8080 (console)   │  │   │  │
-│  │   │  │ WORKDIR: /app       │  │                   │  │   │  │
-│  │   │  │ :8080               │  │                   │  │   │  │
-│  │   │  └──────────┬──────────┘  └────────┬──────────┘  │   │  │
-│  │   │             │                      │             │   │  │
-│  │   │             └──────────┬───────────┘             │   │  │
-│  │   │                        │                         │   │  │
-│  │   │             ┌──────────▼──────────┐              │   │  │
-│  │   │             │  Volume Nomeado     │              │   │  │
-│  │   │             │  eclipse_h2_data    │              │   │  │
-│  │   │             │  /app/data          │              │   │  │
-│  │   │             │  eclipsedb.mv.db    │              │   │  │
-│  │   │             └─────────────────────┘              │   │  │
-│  │   └──────────────────────────────────────────────────┘   │  │
-│  └──────────────────────────────────────────────────────────┘  │
-└────────────────────────────────────────────────────────────────┘
-         ▲
-         │  HTTP :8080
-         │
-┌────────┴──────────┐
-│  Cliente / Postman│
-│  curl / Swagger   │
-└───────────────────┘
-```
+![Arquitetura Macro](GS-Cloud.drawio.png)
 
 ---
 
