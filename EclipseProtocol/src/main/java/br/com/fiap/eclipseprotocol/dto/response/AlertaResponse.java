@@ -40,13 +40,12 @@ public class AlertaResponse extends RepresentationModel<AlertaResponse> {
                 a.getMensagem(),
                 a.getStatus() != null ? a.getStatus().name() : null,
                 a.getDataCriacao(),
+                // idLeitura — acessa só o ID, sem navegar nas relações lazy
                 a.getLeitura() != null ? a.getLeitura().getId() : null,
-                a.getLeitura() != null && a.getLeitura().getSensor() != null
-                        && a.getLeitura().getSensor().getPlantacao() != null
-                        ? a.getLeitura().getSensor().getPlantacao().getId() : null,
-                a.getLeitura() != null && a.getLeitura().getSensor() != null
-                        && a.getLeitura().getSensor().getPlantacao() != null
-                        ? a.getLeitura().getSensor().getPlantacao().getCultura() : null
+                // idPlantacao — usa o campo direto de Alerta, sem passar por Leitura→Sensor
+                a.getPlantacao() != null ? a.getPlantacao().getId() : null,
+                // cultura — usa o campo direto de Alerta→Plantacao
+                a.getPlantacao() != null ? a.getPlantacao().getCultura() : null
         );
     }
 }
