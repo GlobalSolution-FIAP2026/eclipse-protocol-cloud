@@ -8,15 +8,15 @@ import java.time.LocalDateTime;
 
 @Getter
 public class AlertaResponse extends RepresentationModel<AlertaResponse> {
-    private Long id;
-    private String tipoAlerta;
-    private String severidade;
-    private String mensagem;
-    private String status;
-    private LocalDateTime dataCriacao;
-    private Long idLeitura;
-    private Long idPlantacao;
-    private String cultura;
+    private final Long id;
+    private final String tipoAlerta;
+    private final String severidade;
+    private final String mensagem;
+    private final String status;
+    private final LocalDateTime dataCriacao;
+    private final Long idLeitura;
+    private final Long idPlantacao;
+    private final String cultura;
 
     private AlertaResponse(Long id, String tipoAlerta, String severidade, String mensagem,
                            String status, LocalDateTime dataCriacao, Long idLeitura,
