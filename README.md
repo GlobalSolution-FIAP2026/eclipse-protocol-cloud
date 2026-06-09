@@ -369,9 +369,9 @@ docker compose logs -f eclipse-db
 # http://localhost:8080/swagger-ui.html
 
 # 7. Verificar usuário dos containers
-docker container exec RM561082-eclipse-app whoami   # eclipse
-docker container exec RM561082-eclipse-app pwd       # /app
-docker container exec RM561082-eclipse-app ls -l /app
+docker container exec RM555999-eclipse-app whoami   # eclipse
+docker container exec RM555999-eclipse-app pwd       # /app
+docker container exec RM555999-eclipse-app ls -l /app
 
 # 8. Derrubar (sem apagar dados)
 docker compose down
@@ -433,7 +433,7 @@ ENTRYPOINT ["java", \
 services:
   eclipse-db:
     image: oscarfonts/h2:latest
-    container_name: RM561082-eclipse-db
+    container_name: RM555999-eclipse-db
     restart: unless-stopped
     environment:
       H2_OPTIONS: "-tcp -tcpAllowOthers -tcpPort 9092 -web -webAllowOthers -webPort 8082"
@@ -447,7 +447,7 @@ services:
 
   eclipse-app:
     build: .
-    container_name: RM561082-eclipse-app
+    container_name: RM555999-eclipse-app
     restart: unless-stopped
     depends_on: [eclipse-db]
     environment:
@@ -489,7 +489,7 @@ Para remover ao final:
 
 ## 10. Vídeo explicativo
 
-[Vídeo explicativo](https://youtu.be/JpHNS4_ZvZY)
+[![Vídeo explicativo](https://img.youtube.com/vi/JpHNS4_ZvZY/maxresdefault.jpg)](https://youtu.be/JpHNS4_ZvZY)
 
 ---
 
