@@ -349,7 +349,7 @@ Além da camada agrícola, o projeto conta com uma **camada espacial** que monit
 ```bash
 # 1. Clonar o repositório
 git clone https://github.com/GlobalSolution-FIAP2026/eclipse-protocol-cloud.git
-cd eclipse-protocol-java
+cd eclipse-protocol-cloud
 
 # 2. Subir os 2 containers em background
 docker compose up -d --build
@@ -362,7 +362,7 @@ docker compose logs -f eclipse-app
 docker compose logs -f eclipse-db
 
 # 5. Acessar H2 Console
-# http://localhost:8082
+# http://localhost:8080/h2-console
 # JDBC URL: jdbc:h2:file:/app/data/eclipsedb
 
 # 6. Acessar Swagger
