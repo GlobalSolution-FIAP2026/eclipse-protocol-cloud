@@ -528,20 +528,9 @@ Para remover ao final:
 
 ---
 
-## 10. Evidências SELECT no Banco
+## 10. Vídeo explicativo
 
-```bash
-# Conectar no container do banco e executar SELECT
-docker container exec RM561082-eclipse-db \
-  java -cp /opt/h2*.jar org.h2.tools.Shell \
-  -url "jdbc:h2:file:/opt/h2-data/eclipsedb" \
-  -user sa -password "" \
-  -sql "SELECT * FROM TB_USUARIO;"
-
-# Ou via H2 Console Web:
-# http://<HOST>:8080
-# JDBC URL: jdbc:h2:file:/opt/h2-data/eclipsedb
-```
+[Vídeo explicativo](https://youtu.be/JpHNS4_ZvZY)
 
 ---
 
