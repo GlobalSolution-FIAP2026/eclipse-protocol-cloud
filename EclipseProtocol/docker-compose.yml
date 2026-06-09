@@ -11,7 +11,7 @@ services:
   # Container do Banco H2 (Server Mode)
   eclipse-db:
     image: oscarfonts/h2:latest
-    container_name: RM561082-eclipse-db
+    container_name: RM555999-eclipse-db
     restart: unless-stopped
     environment:
       H2_OPTIONS: "-tcp -tcpAllowOthers -tcpPort 9092 -web -webAllowOthers -webPort 8082"
@@ -28,7 +28,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: RM561082-eclipse-app
+    container_name: RM555999-eclipse-app
     restart: unless-stopped
     depends_on:
       - eclipse-db
